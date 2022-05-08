@@ -811,7 +811,12 @@ defmodule Axon.Compiler do
       end
 
     input = safe_as_type(res, compute)
-    carry = deep_new(hidden_state, &safe_as_type(&1, compute))
+
+    carry =
+      case deep_new(hidden_state, &safe_as_type(&1, compute)) do
+        %{prediction: carry} -> carry
+        carry -> carry
+      end
 
     # TODO: Should these be hooked together? Not at all?
     {input, carry} = apply_hooks({input, carry}, :pre_forward, mode, hooks)
